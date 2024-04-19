@@ -1,0 +1,352 @@
+openapi: 3.0.0
+info:
+  title: My API
+  version: 1.0.0
+  description: These are the APIs of My Small Projects 
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
+
+paths:
+  /:
+    get:
+      tags:
+        - Home
+      description: Home
+      responses:
+        '200':
+          description: Home Page
+        '401':
+          description: Unauthorized
+  
+  /user/:
+    get:
+      tags:
+        - User API
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /user/login:
+    post:
+      tags:
+        - User API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Email:
+                  type: string
+                Password:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /user/register:
+    post:
+      tags:
+        - User API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                LoginID:
+                  type: string
+                Name:
+                  type: string
+                Email:
+                  type: string
+                Password:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /user/edit/{id}:
+    patch:
+      tags:
+        - User API
+      description: User
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                user_type:
+                  type: string
+
+      responses:
+        '200':
+          description: User Page
+        '401':
+          description: Unauthorized
+
+
+
+
+  # /url/all:
+  #   get:
+  #     tags:
+  #       - URL API
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               subject:
+  #                 type: string
+  #               text:
+  #                 type: string
+  #               html:
+  #                 type: string
+  #     responses:
+  #       '200':
+  #         description: Success
+  #       '201':
+  #         description: Something is wrong.
+
+  # /url/short:
+  #   post:
+  #     tags:
+  #       - URL API
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               subject:
+  #                 type: string
+  #               text:
+  #                 type: string
+  #               html:
+  #                 type: string
+  #     responses:
+  #       '200':
+  #         description: Success
+  #       '201':
+  #         description: Something is wrong.
+
+  #       description: Something is wrong.
+
+  # /url/{urlId}:
+  #   patch:
+  #     tags:
+  #       - URL API
+  #     description: User
+  #     parameters:
+  #       - in: path
+  #         name: urlId
+  #         schema:
+  #           type: string
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               username:
+  #                 type: string
+  #               email:
+  #                 type: string
+  #               password:
+  #                 type: string
+  #               user_type:
+  #                 type: string
+
+  #     responses:
+  #       '200':
+  #         description: User Page
+  #       '401':
+  #         description: Unauthorized
+
+
+
+  /mail/sendmail:
+    post:
+      tags:
+        - Mail API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                To:
+                  type: array
+                  items:
+                    type: string
+                subject:
+                  type: string
+                text:
+                  type: string
+                html:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Something is wrong.
+
+  /mail/sendmsg:
+    post:
+      tags:
+        - Mail API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                To:
+                  type: array
+                  items:
+                    type: string
+                subject:
+                  type: string
+                text:
+                  type: string
+                html:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '201':
+          description: Something is wrong.
+
+
+  /pdf/create:
+    get:
+      tags:
+        - PDF API
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /pdf/ejsformat:
+    get:
+      tags:
+        - PDF API
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /pdf/mailpdf:
+    get:
+      tags:
+        - PDF API
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+
+  /pdf/sendpdf:
+    post:
+      tags:
+        - PDF API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /salary/calculateNewSalary:
+    post:
+      tags:
+        - Salary API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentSalary:
+                  type: number
+                hikePercentage:
+                  type: number
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /salary/calculateHikePercentage:
+    post:
+      tags:
+        - Salary API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentSalary:
+                  type: number
+                newSalary:
+                  type: number
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+
+    
