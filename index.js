@@ -15,15 +15,14 @@ app.use(cors({ origin: true, credentials: true }));
 
 const swaggerUI = require('swagger-ui-express');
 const YAML = require("yamljs");
-const { startJobs ,specific_times} = require("./src/controllers/cron.controller");
 
 
 app.set("views", path.join("views"));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + '/src'));
 
-const swaggerDocument = YAML.load(path.join(__dirname, '/swagger.yaml'));
-app.use('/sgr', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+// const swaggerDocument = YAML.load(path.join(__dirname, '/swagger.yaml'));
+// app.use('/sgr', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 
 app.get('/',(req,res,next)=>{
@@ -34,25 +33,14 @@ app.get('/',(req,res,next)=>{
         console.log(error);
     }
 })
-app.get('/resume',(req,res,next)=>{
-    try {
-        // res.status(200).send("testing")
-        res.render('./PDF/PDF_format')
-    } catch (error) {
-        console.log(error);
-    }
-})
+
 
 app.use('/mail',require('./src/Routes/mail.route'));
-app.use('/url',require('./src/Routes/url.route'));
-app.use('/heart',require('./src/Routes/heart.route'));
 app.use('/user',require('./src/Routes/user.route'));
 app.use('/pdf',require('./src/Routes/pdf.route'));
 app.use('/excel',require('./src/Routes/excel.route'));
-app.use('/salary',require('./src/Routes/Salary.route'));
+app.use('/product',require('./src/Routes/Product.route'));
 
-// startJobs()
-// specific_times()
 
 app.listen(Port,()=>{
     try {

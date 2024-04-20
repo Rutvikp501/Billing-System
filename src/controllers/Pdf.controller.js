@@ -201,3 +201,11 @@ exports.PDF_Mail = async (req, res) => {
     }
 };
 
+exports.Resume = async (req, res) => {
+    try {
+      // res.status(200).send("testing")
+      res.render('./PDF/PDF_format')
+  } catch (error) {
+      console.log(error);
+  }
+};

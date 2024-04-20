@@ -115,169 +115,10 @@ paths:
           description: Unauthorized
 
 
-
-
-  # /url/all:
-  #   get:
-  #     tags:
-  #       - URL API
-  #     requestBody:
-  #       required: true
-  #       content:
-  #         application/json:
-  #           schema:
-  #             type: object
-  #             properties:
-  #               subject:
-  #                 type: string
-  #               text:
-  #                 type: string
-  #               html:
-  #                 type: string
-  #     responses:
-  #       '200':
-  #         description: Success
-  #       '201':
-  #         description: Something is wrong.
-
-  # /url/short:
-  #   post:
-  #     tags:
-  #       - URL API
-  #     requestBody:
-  #       required: true
-  #       content:
-  #         application/json:
-  #           schema:
-  #             type: object
-  #             properties:
-  #               subject:
-  #                 type: string
-  #               text:
-  #                 type: string
-  #               html:
-  #                 type: string
-  #     responses:
-  #       '200':
-  #         description: Success
-  #       '201':
-  #         description: Something is wrong.
-
-  #       description: Something is wrong.
-
-  # /url/{urlId}:
-  #   patch:
-  #     tags:
-  #       - URL API
-  #     description: User
-  #     parameters:
-  #       - in: path
-  #         name: urlId
-  #         schema:
-  #           type: string
-  #     requestBody:
-  #       required: true
-  #       content:
-  #         application/json:
-  #           schema:
-  #             type: object
-  #             properties:
-  #               username:
-  #                 type: string
-  #               email:
-  #                 type: string
-  #               password:
-  #                 type: string
-  #               user_type:
-  #                 type: string
-
-  #     responses:
-  #       '200':
-  #         description: User Page
-  #       '401':
-  #         description: Unauthorized
-
-
-
-  /mail/sendmail:
-    post:
-      tags:
-        - Mail API
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                To:
-                  type: array
-                  items:
-                    type: string
-                subject:
-                  type: string
-                text:
-                  type: string
-                html:
-                  type: string
-      responses:
-        '200':
-          description: Success
-        '201':
-          description: Something is wrong.
-
-  /mail/sendmsg:
-    post:
-      tags:
-        - Mail API
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                To:
-                  type: array
-                  items:
-                    type: string
-                subject:
-                  type: string
-                text:
-                  type: string
-                html:
-                  type: string
-      responses:
-        '200':
-          description: Success
-        '201':
-          description: Something is wrong.
-
-
-  /pdf/create:
+/product/:
     get:
       tags:
-        - PDF API
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-
-  /pdf/ejsformat:
-    get:
-      tags:
-        - PDF API
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-
-  /pdf/mailpdf:
-    get:
-      tags:
-        - PDF API
+        - Product API
       responses:
         '200':
           description: Success
@@ -285,10 +126,11 @@ paths:
           description: Bad Request
 
 
-  /pdf/sendpdf:
+
+  /product/createProducts:
     post:
       tags:
-        - PDF API
+        - Product API
       requestBody:
         required: true
         content:
@@ -296,57 +138,50 @@ paths:
             schema:
               type: object
               properties:
-                name:
+                Product:
                   type: string
-                email:
+                SKU:
+                  type: number
+                DPL:
+                  type: number
+                Quantity:
+                  type: number
+      responses:
+        '200':
+          description: Success
+        '400':
+          description: Bad Request
+
+  /product/update/{id}:
+    patch:
+      tags:
+        - Product API
+      description: Product
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Product:
                   type: string
+                SKU:
+                  type: number
+                DPL:
+                  type: number
+                Quantity:
+                  type: number
+
       responses:
         '200':
-          description: Success
-        '400':
-          description: Bad Request
-
-  /salary/calculateNewSalary:
-    post:
-      tags:
-        - Salary API
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                currentSalary:
-                  type: number
-                hikePercentage:
-                  type: number
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
-
-  /salary/calculateHikePercentage:
-    post:
-      tags:
-        - Salary API
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                currentSalary:
-                  type: number
-                newSalary:
-                  type: number
-      responses:
-        '200':
-          description: Success
-        '400':
-          description: Bad Request
+          description: Product Page
+        '401':
+          description: Unauthorized
 
 
-    
