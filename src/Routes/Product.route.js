@@ -4,6 +4,7 @@ const router = require('express').Router();
 
 
 router.get('/',Product.GetAllProduct)
+router.get('/fileupload',Product.fileupload)
 router.post('/createProducts',Product.CreateProducts)
 router.post('/edit',Product.Edit)
 router.post('/update',Product.Update)

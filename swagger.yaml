@@ -113,9 +113,8 @@ paths:
           description: User Page
         '401':
           description: Unauthorized
-
-
-/product/:
+  
+  /product/:
     get:
       tags:
         - Product API
@@ -124,6 +123,8 @@ paths:
           description: Success
         '400':
           description: Bad Request
+
+
 
 
 

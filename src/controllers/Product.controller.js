@@ -1,4 +1,8 @@
 const Productmodel = require("../models/Product.model");
+const XLSX = require('xlsx');
+
+const multer = require('multer');
+const upload = multer().single('file');
 
 exports.GetAllProduct = async (req, res) => {
 
@@ -13,12 +17,23 @@ exports.GetAllProduct = async (req, res) => {
         console.log(error);
     }
 };
+exports.fileupload = async (req, res, next) => {
+    try {
+        const data = await Productmodel.find();
+        res.render("fileupload", { data: data });
+        // res.render("fileupload");
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+}
 
 exports.CreateProducts = async (req, res) => {
     const { Product, SKU, DPL, Quantity } = req.body
     const getExistingProduct = await Productmodel.find({ Product: Product });
 
     try {
+
 
         if (getExistingProduct != "") {
             return res.send({ status: "failed", message: "Product Already exist" });
@@ -86,9 +101,52 @@ exports.Update = async (req, res) => {
 };
 
 
-
 exports.insertProductData = async (req, res, next) => {
+    upload(req, res, async (err) => {
+        if (err) {
+            console.error('Error uploading file:', err);
+            return res.status(500).send('Internal Server Error');
+        }
+        const Data = req;
+        console.log(Data);
+        try {
+            const workbook = XLSX.read(req.file.buffer);
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            const tabularData = XLSX.utils.sheet_to_json(sheet);
+            console.log(tabularData);
+            let currentProduct = ''; // Track the current product being processed
+            const processedData = [];
+
+            tabularData.forEach(entry => {
+                if (entry.Product) {
+                    // If Product field is present, update current product
+                    currentProduct = entry.Product;
+                } else if (entry['SKU '] && entry.DPL) {
+                    // If both SKU and DPL are defined, add the entry
+                    processedData.push({
+                        product: currentProduct,
+                        sku: entry['SKU '], // Remove extra space in the key
+                        dpl: entry.DPL
+                        // Add other fields as needed
+                    });
+                }
+            });
+            console.log(processedData);
+
+            //const result = await Productmodel.insertMany(jsonData);
+            res.send(`${processedData} documents inserted`);
+        } catch (err) {
+            console.error('Error:', err);
+            res.status(500).send('Internal Server Error');
+        }
+    });
+};
+
+
+exports.insertProductData1 = async (req, res, next) => {
     const jsonData = req.body;
+    console.log(jsonData);
     try {
         for (const sheetName in jsonData) {
             if (jsonData.hasOwnProperty(sheetName)) {
@@ -96,35 +154,28 @@ exports.insertProductData = async (req, res, next) => {
                 for (const entry of sheetData) {
                     // Check if the entry has a Product field
                     if (entry['Product']) {
-                        const { 'Product': Product, SKU, diyan, kj2004, } = entry;
+                        const { 'Product': Product, SKU, DPL, Quantity } = entry;
                         // Create an array of players with their points
-                        const playersData = [
-                            { name: 'ishan', points: ishan },
-                            { name: 'diyan', points: diyan },
-                            { name: 'kj2004', points: kj2004 },
-                            { name: 'vedant', points: vedant },
-                            { name: 'aryan', points: aryan },
-                            { name: 'vishesh', points: vishesh },
-                            { name: 'shreyans', points: shreyans },
-                            { name: 'hitanshu', points: hitanshu }
-                        ];
+
 
                         // Check if the data already exists in the database
-                        const existingProduct = await ProductData.findOne({ Product: Product });
+                        const existingProduct = await Productmodel.findOne({ Product: Product });
 
                         if (existingProduct) {
                             // Update existing Product data
-                            existingProduct.players = playersData;
-                            await existingProduct.save();
+                            existingProduct.Product = existingProduct;
+                            //await existingProduct.save();
                             console.log('Product data updated successfully');
                         } else {
                             // Create a new ProductData object and save it to the database
                             const ProductData = new ProductData({
-                                date: date,
                                 Product: Product,
-                                players: playersData
+                                SKU: SKU,
+                                DPL: DPL,
+                                Quantity: Quantity
                             });
-                            await ProductData.save();
+                            // await ProductData.save();
+                            console.log(ProductData);
                             // console.log('Product data inserted successfully');
                         }
                     } else {
@@ -138,3 +189,5 @@ exports.insertProductData = async (req, res, next) => {
         console.error('Error inserting/updating Product data:', error);
     }
 };
+
+

@@ -21,8 +21,8 @@ app.set("views", path.join("views"));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + '/src'));
 
-// const swaggerDocument = YAML.load(path.join(__dirname, '/swagger.yaml'));
-// app.use('/sgr', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+const swaggerDocument = YAML.load(path.join(__dirname, '/swagger.yaml'));
+app.use('/sgr', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 
 app.get('/',(req,res,next)=>{
