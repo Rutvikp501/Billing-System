@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 require('dotenv').config()
 
 // const DB_URL= process.env.DBURL;
-const DB_URL= 'mongodb://0.0.0.0:27017';
-const DB_name='smallproject'
+const DB_URL= 'mongodb://0.0.0.0:27017/';
+const DB_name='Billingsystem'
 const Connect_DB =async()=>{
     try {
         await mongoose.connect(DB_URL);
@@ -21,6 +21,11 @@ const ConnectDB_Name =async()=>{
     }
 }
 
+const { MongoClient } = require('mongodb');
+
+
+
+
 // const ConnectDB_Name = mongoose.createConnection(DB_URL + DB_name,{ } )
 
 // async function closeConnections(){
@@ -34,4 +39,4 @@ const ConnectDB_Name =async()=>{
 // }
 
 // closeConnections();
-module.exports={Connect_DB,ConnectDB_Name}
+module.exports={Connect_DB,ConnectDB_Name,}

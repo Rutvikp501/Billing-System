@@ -4,7 +4,7 @@ const app= express();
 const bodyParser = require('body-parser');
 const path = require('path')
 const Port= process.env.PORT || 5011;
-const DB_URL= process.env.DBURL ;
+//const DB_URL= process.env.DBURL ;
 const DB_Conn = require('./src/config/DB_Conn')
 require('dotenv').config()
 
@@ -44,7 +44,7 @@ app.use('/product',require('./src/Routes/Product.route'));
 
 app.listen(Port,()=>{
     try {
-        DB_Conn.Connect_DB(DB_URL);
+        DB_Conn.ConnectDB_Name();
         console.log(`Server is running on : http://localhost:${Port}`);
     } catch (error) {
         console.log(error);

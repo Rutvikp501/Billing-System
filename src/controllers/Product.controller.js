@@ -29,7 +29,7 @@ exports.fileupload = async (req, res, next) => {
 }
 
 exports.CreateProducts = async (req, res) => {
-    const { Product, SKU, DPL, Quantity } = req.body
+    const { Product,Competition_Product, SKU, DPL, Quantity } = req.body
     const getExistingProduct = await Productmodel.find({ Product: Product });
 
     try {
@@ -40,12 +40,13 @@ exports.CreateProducts = async (req, res) => {
         } else {
             const Product = new Productmodel({
                 Product: Product,
+                Competition_Product: Competition_Product,
                 SKU: SKU,
                 DPL: DPL,
                 Quantity: Quantity
             })
-
-            await Product.save();
+console.log(Product);
+            //await Product.save();
             res.send("Product Registered Successfully");
         }
 
@@ -108,38 +109,65 @@ exports.insertProductData = async (req, res, next) => {
             return res.status(500).send('Internal Server Error');
         }
         const Data = req;
-        console.log(Data);
+        //console.log(Data);
         try {
             const workbook = XLSX.read(req.file.buffer);
             const sheetName = workbook.SheetNames[0];
             const sheet = workbook.Sheets[sheetName];
             const tabularData = XLSX.utils.sheet_to_json(sheet);
-            console.log(tabularData);
-            let currentProduct = ''; // Track the current product being processed
-            const processedData = [];
-
+            const ProductgroupedData = {};
+            let currentCompetitionProduct = '';
+            let currentProduct = '';
+            
+            
             tabularData.forEach(entry => {
-                if (entry.Product) {
-                    // If Product field is present, update current product
-                    currentProduct = entry.Product;
-                } else if (entry['SKU '] && entry.DPL) {
-                    // If both SKU and DPL are defined, add the entry
-                    processedData.push({
-                        product: currentProduct,
-                        sku: entry['SKU '], // Remove extra space in the key
-                        dpl: entry.DPL
-                        // Add other fields as needed
-                    });
+                if (entry['Product']) {
+                    currentProduct = entry['Product'];
+                } else {
+                    entry['Product'] = currentProduct;
                 }
+            
+                if (entry['competition Product']) {
+                    currentCompetitionProduct = entry['competition Product'];
+                } else {
+                    entry['competition Product'] = currentCompetitionProduct;
+                }
+            
+                const competitionProduct = entry['competition Product'];
+                const product = entry['Product'];
+                if (!ProductgroupedData[product]) {
+                    ProductgroupedData[product] = {};
+                }
+                if (!ProductgroupedData[product][competitionProduct]) {
+                    ProductgroupedData[product][competitionProduct] = [];
+                }
+                ProductgroupedData[product][competitionProduct].push({ 'Product': product, 'competition Product': competitionProduct, SKU: entry['SKU '], DPL: entry.DPL });
             });
-            console.log(processedData);
-
-            //const result = await Productmodel.insertMany(jsonData);
-            res.send(`${processedData} documents inserted`);
+            
+            const result = Object.values(ProductgroupedData).map(product => Object.values(product));
+            result.forEach(productGroups => {
+                productGroups.forEach(competitionGroups => {
+                    competitionGroups.forEach(async entry => {
+                         //console.log(entry['Product'], entry['competition Product'], entry.SKU, entry.DPL);
+                        // const ProductData = await Productmodel.insertMany(result);
+                         //console.log(ProductData);
+                         const Product = new Productmodel({
+                            Product: entry['Product'],
+                            Competition_Product: entry['competition Product'],
+                            SKU: entry.SKU,
+                            DPL: entry.DPL,
+                        })
+                        //await Product.save();
+                       //console.log(Product);
+                    });
+                });
+            });
+            res.send(`${result} competition products processed`); // Sending the number of processed competition products
         } catch (err) {
             console.error('Error:', err);
             res.status(500).send('Internal Server Error');
         }
+
     });
 };
 
