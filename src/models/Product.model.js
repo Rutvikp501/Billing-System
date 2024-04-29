@@ -6,7 +6,7 @@ const ProductSchema =  new Schema({
     Competition_Product:{type:String, },
     SKU:{type:String, },
     DPL:{type:Number, },
-    Quantity:{type:Number, },
+    Quantity:{type:Number,default:0 },
     
 });
 

@@ -44,7 +44,7 @@ app.use('/product',require('./src/Routes/Product.route'));
 
 app.listen(Port,()=>{
     try {
-        DB_Conn.ConnectDB_Name();
+        DB_Conn.Connect_DB();
         console.log(`Server is running on : http://localhost:${Port}`);
     } catch (error) {
         console.log(error);

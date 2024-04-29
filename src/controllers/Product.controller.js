@@ -3,13 +3,39 @@ const XLSX = require('xlsx');
 
 const multer = require('multer');
 const upload = multer().single('file');
-
 exports.GetAllProduct = async (req, res) => {
 
     try {
         const Product = await Productmodel.find();
         if (Product.length > 0) {
             res.status(200).send(Product)
+        } else {
+            res.status(200).send("Dont have Products To Show...")
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+exports.ShowAllProduct = async (req, res) => {
+
+    try {
+        const Product = await Productmodel.find();
+        if (Product.length > 0) {
+            Product.sort((a, b) => {
+                // Convert both Product names to lowercase for case-insensitive comparison
+                const productA = a.Product.toLowerCase();
+                const productB = b.Product.toLowerCase();
+                
+                
+                if (productA < productB) {
+                    return -1; //
+                } else if (productA > productB) {
+                    return 1; 
+                } else {
+                    return 0; 
+                }
+            });
+            res.render("EJS/AllProducts", { data: Product });
         } else {
             res.status(200).send("Dont have Products To Show...")
         }
@@ -109,7 +135,6 @@ exports.insertProductData = async (req, res, next) => {
             return res.status(500).send('Internal Server Error');
         }
         const Data = req;
-        //console.log(Data);
         try {
             const workbook = XLSX.read(req.file.buffer);
             const sheetName = workbook.SheetNames[0];
@@ -149,7 +174,7 @@ exports.insertProductData = async (req, res, next) => {
                 productGroups.forEach(competitionGroups => {
                     competitionGroups.forEach(async entry => {
                          //console.log(entry['Product'], entry['competition Product'], entry.SKU, entry.DPL);
-                        // const ProductData = await Productmodel.insertMany(result);
+                         //const ProductData = await Productmodel.insertMany(result);
                          //console.log(ProductData);
                          const Product = new Productmodel({
                             Product: entry['Product'],
@@ -158,7 +183,7 @@ exports.insertProductData = async (req, res, next) => {
                             DPL: entry.DPL,
                         })
                         //await Product.save();
-                       //console.log(Product);
+                       console.log(Product);
                     });
                 });
             });
@@ -172,50 +197,78 @@ exports.insertProductData = async (req, res, next) => {
 };
 
 
-exports.insertProductData1 = async (req, res, next) => {
-    const jsonData = req.body;
-    console.log(jsonData);
-    try {
-        for (const sheetName in jsonData) {
-            if (jsonData.hasOwnProperty(sheetName)) {
-                const sheetData = jsonData[sheetName];
-                for (const entry of sheetData) {
-                    // Check if the entry has a Product field
-                    if (entry['Product']) {
-                        const { 'Product': Product, SKU, DPL, Quantity } = entry;
-                        // Create an array of players with their points
-
-
-                        // Check if the data already exists in the database
-                        const existingProduct = await Productmodel.findOne({ Product: Product });
-
-                        if (existingProduct) {
-                            // Update existing Product data
-                            existingProduct.Product = existingProduct;
-                            //await existingProduct.save();
-                            console.log('Product data updated successfully');
-                        } else {
-                            // Create a new ProductData object and save it to the database
-                            const ProductData = new ProductData({
-                                Product: Product,
-                                SKU: SKU,
-                                DPL: DPL,
-                                Quantity: Quantity
-                            });
-                            // await ProductData.save();
-                            console.log(ProductData);
-                            // console.log('Product data inserted successfully');
-                        }
-                    } else {
-                        console.log('Skipping entry without a Product field');
+exports.insertProductData = async (req, res, next) => {
+    upload(req, res, async (err) => {
+        if (err) {
+            console.error('Error uploading file:', err);
+            return res.status(500).send('Internal Server Error');
+        }
+        const Data = req;
+        try {
+            const workbook = XLSX.read(req.file.buffer);
+            const sheetName = workbook.SheetNames[0];
+            const sheet = workbook.Sheets[sheetName];
+            const tabularData = XLSX.utils.sheet_to_json(sheet);
+            const ProductgroupedData = {};
+            let currentCompetitionProduct = '';
+            let currentProduct = '';
+            
+            // Function to check if a document already exists in the database
+            const isDuplicateEntry = async (product, competitionProduct) => {
+                const existingEntry = await Productmodel.findOne({ Product: product, Competition_Product: competitionProduct });
+                return !!existingEntry; // Returns true if a matching document is found
+            };
+            
+            for (const entry of tabularData) {
+                if (entry['Product']) {
+                    currentProduct = entry['Product'];
+                } else {
+                    entry['Product'] = currentProduct;
+                }
+            
+                if (entry['competition Product']) {
+                    currentCompetitionProduct = entry['competition Product'];
+                } else {
+                    entry['competition Product'] = currentCompetitionProduct;
+                }
+            
+                const competitionProduct = entry['competition Product'];
+                const product = entry['Product'];
+                if (!ProductgroupedData[product]) {
+                    ProductgroupedData[product] = {};
+                }
+                if (!ProductgroupedData[product][competitionProduct]) {
+                    ProductgroupedData[product][competitionProduct] = [];
+                }
+                const isDuplicate = await isDuplicateEntry(product, competitionProduct);
+                if (!isDuplicate) {
+                    ProductgroupedData[product][competitionProduct].push({ 'Product': product, 'competition Product': competitionProduct, SKU: entry['SKU '], DPL: entry.DPL });
+                }
+            }
+            
+            const result = Object.values(ProductgroupedData).map(product => Object.values(product));
+            for (const productGroups of result) {
+                for (const competitionGroups of productGroups) {
+                    for (const entry of competitionGroups) {
+                        const Product = new Productmodel({
+                            Product: entry['Product'],
+                            Competition_Product: entry['competition Product'],
+                            SKU: entry.SKU,
+                            DPL: entry.DPL,
+                        });
+                        // Save the document only if it's not a duplicate
+                        await Product.save();
                     }
                 }
             }
+            res.send(`${result} competition products processed`); // Sending the number of processed competition products
+        } catch (err) {
+            console.error('Error:', err);
+            res.status(500).send('Internal Server Error');
         }
 
-    } catch (error) {
-        console.error('Error inserting/updating Product data:', error);
-    }
+    });
 };
+
 
 

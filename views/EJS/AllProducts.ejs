@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Products</title>
+    <style>
+        body{
+            background: -webkit-linear-gradient(left, #25c481, #25b7c4);
+  background: linear-gradient(to right, #25c481, #25b7c4);
+  font-family: 'Roboto', sans-serif;
+}
+
+.results tr[visible='false'],
+.no-result{
+  display:none;
+}
+
+.results tr[visible='true']{
+  display:table-row;
+}
+
+.counter{
+  padding:8px; 
+  color:#ccc;
+}
+table{
+  width:100%;
+  table-layout: fixed;
+}
+th{
+  padding: 20px 15px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 12px;
+  color: #fff;
+  text-transform: uppercase;
+}
+td{
+  padding: 15px;
+  text-align: left;
+  vertical-align:middle;
+  font-weight: 300;
+  font-size: 12px;
+  color: #fff;
+  border-bottom: solid 1px rgba(255,255,255,0.1);
+}
+.searchinput{
+    font-size: 30px;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 300;
+  text-align: center;
+  margin-bottom: 15px;
+}
+.search {
+  border: 2px solid transparent;
+  width: 15em;
+  height: 2.5em;
+  padding-left: 0.8em;
+  outline: none;
+  overflow: hidden;
+  background-color: #F3F3F3;
+  border-radius: 10px;
+  transition: all 0.5s;
+}
+
+.search:hover,
+.search:focus {
+  border: 2px solid #4A9DEC;
+  box-shadow: 0px 0px 0px 7px rgb(74, 157, 236, 20%);
+  background-color: white;
+}
+
+/* .tbl-header{
+  background-color: rgba(255,255,255,0.3);
+ } */
+    </style>
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+      $(".search").keyup(function () {
+        var searchTerm = $(".search").val();
+        var listItem = $('.results tbody').children('tr');
+        var searchSplit = searchTerm.replace(/ /g, "'):containsi('")
+        
+      $.extend($.expr[':'], {'containsi': function(elem, i, match, array){
+            return (elem.textContent || elem.innerText || '').toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
+        }
+      });
+        
+      $(".results tbody tr").not(":containsi('" + searchSplit + "')").each(function(e){
+        $(this).attr('visible','false');
+      });
+    
+      $(".results tbody tr:containsi('" + searchSplit + "')").each(function(e){
+        $(this).attr('visible','true');
+      });
+    
+      var jobCount = $('.results tbody tr[visible="true"]').length;
+        $('.counter').text(jobCount + ' item');
+    
+      if(jobCount == '0') {$('.no-result').show();}
+        else {$('.no-result').hide();}
+              });
+    });
+    </script>
+</head>
+<body>
+    <div class="form-group pull-right searchinput">
+        <input type="text" class="search form-control" placeholder="What you looking for?">
+    </div>
+    <span class="counter pull-right" style=" text-align: center;"></span>
+    <div class="tbl-header">
+        <table class="table table-hover table-bordered results" cellpadding="0" cellspacing="0" border="0">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th class="col-md-3 col-xs-3">Product</th>
+                    <th class="col-md-4 col-xs-4">Competition_Product</th>
+                    <th class="col-md-3 col-xs-3">SKU</th>
+                    <th class="col-md-3 col-xs-3">DPL</th>
+                    <th class="col-md-3 col-xs-3">Quantity</th>
+                </tr>
+                <tr class="warning no-result">
+                    <td colspan="4"><i class="fa fa-warning"></i> No result</td>
+                </tr>
+            </thead>
+            <% if (typeof data !== 'undefined' && data.length > 0) { %>
+            <tbody>
+                <% for (let i = 0; i < data.length; i++) { %>
+                <tr>
+                    <td scope="row"><%= i + 1 %></td>
+                    <td><%= data[i].Product %></td>
+                    <td><%= data[i].Competition_Product %></td>
+                    <td><%= data[i].SKU %></td>
+                    <td><%= data[i].DPL %></td>
+                    <td><%= data[i].DPL %></td>
+                </tr>
+                <% } %>
+            </tbody>
+            <% } else { %>
+            <tbody>
+                <tr>
+                    <td colspan="6">No Data To Show</td>
+                </tr>
+            </tbody>
+            <% } %>
+        </table>
+    </div>
+</body>
+
+</html>
